@@ -42,10 +42,10 @@ Loss = ||ẋ_pred - ẋ_data||²
 ## Custom HNN.jl 
 <img width="600" height="400" alt="HNN_results" src="https://github.com/user-attachments/assets/03803c8d-34c3-4340-8497-8767d30852d1" />
 
-Computing Env
+### Computing Env
 - Mac mini m4
 
-**Training Log**
+### Training Log
 ```text
 training started...
 
