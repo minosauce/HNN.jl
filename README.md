@@ -1,5 +1,5 @@
 # HNN.jl
-```math
+
 **Hamiltonian Neural Network implemented with Lux.jl**
 
 Hamiltonian Neural Networks (HNNs) are neural networks that learn the **Hamiltonian function** of a dynamical system directly from data, while preserving the underlying **symplectic structure**.
@@ -21,13 +21,13 @@ $$
 
 The canonical symplectic matrix is given by:
 
-
+```math
 J =
 \begin{bmatrix}
 0 & I \\
 - I & 0
 \end{bmatrix}
-
+```
 
 ---
 
@@ -65,6 +65,7 @@ $$
 
 The model is trained by minimizing the discrepancy between predicted and true state derivatives:
 
+```math
 $$
 \mathcal{L}
 =
