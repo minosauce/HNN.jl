@@ -10,19 +10,24 @@ Hamiltonian Neural Networks (HNNs) are neural networks that learn the **Hamilton
 
 The system state is defined in **canonical coordinates** and **canonical momenta**:
 
-\[
-x = \begin{bmatrix} q \\ p \end{bmatrix} \in \mathbb{R}^{2n}
-\]
+$$
+x =
+\begin{bmatrix}
+q \\
+p
+\end{bmatrix}
+\in \mathbb{R}^{2n}
+$$
 
 The canonical symplectic matrix is given by:
 
-\[
+$$
 J =
 \begin{bmatrix}
 0 & I \\
 - I & 0
 \end{bmatrix}
-\]
+$$
 
 ---
 
@@ -30,9 +35,9 @@ J =
 
 The Hamiltonian of a one-dimensional spring–mass system is
 
-\[
+$$
 H(x) = \frac{1}{2} k q^2 + \frac{1}{2} m p^2
-\]
+$$
 
 ---
 
@@ -40,9 +45,9 @@ H(x) = \frac{1}{2} k q^2 + \frac{1}{2} m p^2
 
 The neural network learns an approximation of the Hamiltonian:
 
-\[
+$$
 f_\theta(x) \approx H(x)
-\]
+$$
 
 ---
 
@@ -50,9 +55,9 @@ f_\theta(x) \approx H(x)
 
 The system dynamics are governed by Hamilton’s equations:
 
-\[
+$$
 \dot{x} = J \nabla H(x)
-\]
+$$
 
 ---
 
@@ -60,9 +65,16 @@ The system dynamics are governed by Hamilton’s equations:
 
 The model is trained by minimizing the discrepancy between predicted and true state derivatives:
 
-\[
-\mathcal{L} = \left\| \dot{x}_{\text{pred}} - \dot{x}_{\text{data}} \right\|^2
-\]
+$$
+\mathcal{L}
+=
+\left\|
+\dot{x}_{\text{pred}}
+-
+\dot{x}_{\text{data}}
+\right\|^2
+$$
+
 
 
 ## Custom HNN.jl 
