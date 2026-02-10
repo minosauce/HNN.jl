@@ -9,6 +9,7 @@ Neural networks that learn "the Hamiltonian" of a system from data
 1. HNN's state is canonical coordinates and canonical momenta
 <br>
 x = [q; p] ∈ R^{2n}  % HNN's state
+<br>
 J = [0 I; -I 0]      % canonical symplectic matrix
 <br>
 
