@@ -1,43 +1,69 @@
 # HNN.jl
-Hamiltonian Neural Network (HNN by Lux.jl)
 
-<br>
-Neural networks that learn "the Hamiltonian" of a system from data
-<br>
+**Hamiltonian Neural Network implemented with Lux.jl**
 
-<br>
-1. HNN's state is canonical coordinates and canonical momenta
-<br>
-x = [q; p] ∈ R^{2n}  % HNN's state
-<br>
-J = [0 I; -I 0]      % canonical symplectic matrix
-<br>
+Hamiltonian Neural Networks (HNNs) are neural networks that learn the **Hamiltonian function** of a dynamical system directly from data, while preserving the underlying **symplectic structure**.
 
-<br>
-[Example: 1D Spring mass system]
-<br>
+---
 
-<br>
-H(x) = 1/2 * k * q^2 + 1/2 * m * p^2
-<br>
+## 1. State Representation
 
-<br>
-2. The HNN learns an approximation to the Hamiltonian:
-<br>
-f_θ(x) ~= H(x)
-<br>
+The system state is defined in **canonical coordinates** and **canonical momenta**:
 
-<br>
-3. The differential equations is given by Hamilton's equations:
-<br>
-ẋ = J ∇H(x)
-<br>
+\[
+x = \begin{bmatrix} q \\ p \end{bmatrix} \in \mathbb{R}^{2n}
+\]
 
-<br>
-4. Loss function:
-<br>
-Loss = ||ẋ_pred - ẋ_data||²
-<br>
+The canonical symplectic matrix is given by:
+
+\[
+J =
+\begin{bmatrix}
+0 & I \\
+- I & 0
+\end{bmatrix}
+\]
+
+---
+
+## 2. Example: 1D Spring–Mass System
+
+The Hamiltonian of a one-dimensional spring–mass system is
+
+\[
+H(x) = \frac{1}{2} k q^2 + \frac{1}{2} m p^2
+\]
+
+---
+
+## 3. Hamiltonian Approximation
+
+The neural network learns an approximation of the Hamiltonian:
+
+\[
+f_\theta(x) \approx H(x)
+\]
+
+---
+
+## 4. Dynamics (Hamilton’s Equations)
+
+The system dynamics are governed by Hamilton’s equations:
+
+\[
+\dot{x} = J \nabla H(x)
+\]
+
+---
+
+## 5. Training Objective
+
+The model is trained by minimizing the discrepancy between predicted and true state derivatives:
+
+\[
+\mathcal{L} = \left\| \dot{x}_{\text{pred}} - \dot{x}_{\text{data}} \right\|^2
+\]
+
 
 ## Custom HNN.jl 
 <img width="600" height="400" alt="HNN_results" src="https://github.com/user-attachments/assets/03803c8d-34c3-4340-8497-8767d30852d1" />
