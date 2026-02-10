@@ -32,6 +32,7 @@ f_θ(x) ~= H(x)
 ẋ = J ∇H(x)
 <br>
 
+<br>
 4. Loss function:
 <br>
 Loss = ||ẋ_pred - ẋ_data||²
