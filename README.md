@@ -74,7 +74,7 @@ $$
 \dot{x}_{\text{data}}
 \right\|^2
 $$
-
+```
 
 
 ## Custom HNN.jl 
