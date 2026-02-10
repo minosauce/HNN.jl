@@ -1,5 +1,23 @@
 # HNN.jl
-Hamiltonian Neural Network (by Lux.jl)
+Hamiltonian Neural Network (HNN by Lux.jl)
+
+Neural networks that learn "the Hamiltonian" of a system from data
+
+1. HNN's state is canonical coordinates and canonical momenta
+x = [q; p] ∈ R^{2n} % HNN's state
+J = [0 I; -I 0]     % canonical symplectic matrix
+
+% Example: 1D Harmonic Oscillator
+H(x) = 1/2 * k * q^2 + 1/2 * m * p^2 
+
+2. The HNN learns an approximation to the Hamiltonian:
+f_θ(x) ~= H(x)
+
+3. The differential equations is given by Hamilton's equations:
+ẋ = J ∇H(x)
+
+4. Loss function:
+Loss = ||ẋ_pred - ẋ_data||² 
 
 
 ## Custom HNN.jl 
