@@ -21,13 +21,13 @@ $$
 
 The canonical symplectic matrix is given by:
 
-$$
+```math
 J =
 \begin{bmatrix}
-0 && I \\
-- I && 0
+0 & I \\
+- I & 0
 \end{bmatrix}
-$$
+```
 
 ---
 
