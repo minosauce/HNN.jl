@@ -30,8 +30,8 @@ f_θ(x) ~= H(x)
 3. The differential equations is given by Hamilton's equations:
 <br>
 ẋ = J ∇H(x)
-
 <br>
+
 4. Loss function:
 <br>
 Loss = ||ẋ_pred - ẋ_data||²
