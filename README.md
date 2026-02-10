@@ -43,10 +43,10 @@ Loss = ||ẋ_pred - ẋ_data||²
 <img width="600" height="400" alt="HNN_results" src="https://github.com/user-attachments/assets/03803c8d-34c3-4340-8497-8767d30852d1" />
 
 Computing Env
-: Mac mini m4
+- Mac mini m4
 
-Training Log:
-
+**Training Log**
+```text
 training started...
 
 (epoch : 1 / 125)       Training time: 2.6261 [sec]     Loss: 42.271034
@@ -59,7 +59,7 @@ training started...
 (epoch : 125 / 125)     Training time: 126.5841 [sec]   Loss: 0.010543893
 
 training completed.
-
+```
 
 
 ## DiffEqFlux.jl ([HNN in DiffEqFlux.jl](https://docs.sciml.ai/DiffEqFlux/dev/examples/hamiltonian_nn/#Hamiltonian-Neural-Network))
