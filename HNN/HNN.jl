@@ -1,8 +1,9 @@
 module HNN
-    using Lux, MLUtils, ADTypes, Zygote, ForwardDiff, DifferentiationInterface,
+    using Lux, MLUtils, Zygote, ForwardDiff,
     ComponentArrays, Random, Statistics, LinearAlgebra, OrdinaryDiffEq
 
-    const DI = DifferentiationInterface
+    import ADTypes
+    import DifferentiationInterface as DI
 
     # Hamiltonian Neural Networks (HNNs)
     # Neural networks that learn "the Hamiltonian" of a system from data
@@ -29,9 +30,9 @@ module HNN
             M   <: Lux.AbstractLuxLayer, 
             T   <: AbstractMatrix{<:Real},
             AD  <: ADTypes.AbstractADType
-        } <: Lux.AbstractLuxWrapperLayer{:model}
+        } <: Lux.AbstractLuxWrapperLayer{:layer}
 
-        model   ::M     # hamiltonian neural network
+        layer   ::M     # hamiltonian neural network (with StatefulLuxLayer)
         J       ::T     # canonical or non-canonical symplectic matrix
         ad      ::AD    # AutoDiff backend for gradient computation
     end
@@ -45,121 +46,88 @@ module HNN
                 -In O]
     end
 
-    function auto_diff(ad::String="forward")
-        ad = lowercase(ad)
 
-        ADs = Dict(
-            "forward" => AutoForwardDiff(),
-            "zygote" => AutoZygote(),
-            "enzyme" => AutoEnzyme()
-        )
-
-        return ADs[ad]
+    # 1. Hamiltonian, H(x) 
+    # H(x): vector -> scalar
+    @inline function hamiltonian(hnn::HamiltonianNN, x::AbstractVector, ps, st::NamedTuple)
+        H, _ = Lux.apply(hnn.layer, x, ps, st)
+        return only(H)
     end
 
-
-    # 1. Hamiltonian, H(x)
-    @inline function hamiltonian(hnn::HamiltonianNN, x, ps, st)
-        H, _ = hnn.model(x, ps, st)
+    # H(X): matrix(n×B) -> (1×B) or (B)
+    @inline function hamiltonian(hnn::HamiltonianNN, X::AbstractMatrix, ps, st::NamedTuple)
+        H, _ = Lux.apply(hnn.layer, X, ps, st)
         return H
     end
 
     # 2. ∇H(x) = dH/dx
-    # common gradient function
-    @inline function grad_HNN(hnn::HamiltonianNN, x, ps, st)
-        return DI.gradient(
-            x_i -> hamiltonian(hnn, x_i, ps, st),
-            hnn.ad,
-            x)
+    # ∇H(x): vector -> vector
+    @inline function grad_HNN(hnn::HamiltonianNN, x::AbstractVector, ps, st::NamedTuple)
+        f(u) = hamiltonian(hnn, u, ps, st)
+        ∇H = DI.gradient(f, hnn.ad, x)
+        return ∇H
     end
 
-    # 3. ẋ = J ∇H(x) (call overloading)
-    # vector
-    function (hnn::HamiltonianNN)(x::AbstractVector, ps, st)
-        ∇H = grad_HNN(hnn, x, ps, st)
+    # # matrix(n×B) -> matrix(n×B)
+    # function grad_HNN(hnn::HamiltonianNN, X::AbstractMatrix, ps, st::NamedTuple)
+    #     function summed_H(U)
+    #         H = hamiltonian(hnn, U, ps, st)   # (1,B) or (B,)
+    #         return sum(H)                     # scalar
+    #     end
+        
+    #     ∇H = DI.gradient(summed_H, hnn.ad, X)   # (n × B)
+    #     return ∇H
+    # end
+
+    function grad_HNN(hnn::HamiltonianNN, X::AbstractMatrix, ps, st::NamedTuple)
+        f(u) = hamiltonian(hnn, u, ps, st)
+        ∇H = @view Lux.batched_jacobian(f, hnn.ad, X)[1, :, :]
+        return ∇H
+    end
+
+    # 3. ẋ = J ∇H(x) 
+    # Lux.apply overloads
+    @inline function Lux.apply(hnn::HamiltonianNN, x::AbstractVecOrMat, ps, st::NamedTuple)
+        ∇H = grad_HNN(hnn, x, ps, st)        
         xdot = hnn.J * ∇H
         return xdot, st
     end
 
+    # logging callback
+    # for Optimization.jl solve()
+    function callback_wrapper(interval::Int=0)
+        stime = time()
 
-    # 4. Loss function for HNN
-    function loss_fn(model, ps, st, databatch)
-        X, Xdot = databatch
-        batchsize = size(X, 2)
+        function callback(state, loss)
+            iter = state.iter
+            etime = time() - stime
 
-        loss = mapreduce(+, 1:batchsize) do k
-            x = @view X[:, k]
-            xdot_true = @view Xdot[:, k]
-            xdot_pred, _ = model(x, ps, st)
-            sum(abs2, xdot_pred .- xdot_true)
+            if !(interval==0) && 
+                (iter == 1 || iter % interval == 0)
+                println(
+                    "(iter : $(iter))\t" *
+                    "Loss: $(loss)\t" *
+                    "Training time: $(round(etime, digits=4)) [sec]"
+                )
+            end
+            return false
         end
 
-        return loss / batchsize, st, NamedTuple()
-    end
-
-
-    # Training loop for HNN
-    function train!(
-            tstate::Training.TrainState,
-            dataloader::DataLoader;
-            epochs::Int = 100,
-            log_interval::Int = 0,
-            ad::ADTypes.AbstractADType = AutoForwardDiff()
-        )
-
-        etime = 0f0 # epoch time
-
-        for epoch in 1:epochs
-            epoch_loss = 0f0
-            nbatch = 0
-
-            stime = time() # start time
-            for databatch in dataloader
-                # compute loss
-                _, loss, _, tstate = Training.single_train_step!(
-                    ad, loss_fn, databatch, tstate)
-
-                epoch_loss += loss
-                nbatch += 1
-            end
-            ttime = time() - stime # terminal time
-            etime += ttime
-
-            # average loss over batches
-            epoch_loss /= nbatch
-            
-            # logging
-            if !(log_interval==0) && 
-                (epoch == 1 || epoch % log_interval == 0 || epoch == epochs)
-
-                callback(epoch, epochs, etime, epoch_loss)
-            end
-
-        end # epoch loop
-
-        return tstate
-    end
-
-    # logging callback
-    function callback(epoch::Int, epochs::Int, etime, epoch_loss)
-        println(
-            "(epoch : $epoch / $epochs)\t" *
-            "Training time: $(round(etime, digits=4)) [sec]\t" *
-            "Loss: $(epoch_loss)"
-            )
+        return callback
     end
 
 
     # ODE right-hand side for HamiltonianNN
     function hnn_rhs!(dx, x, p, t)
-        model, ps_trained, st_trained = p
-        dx .= model(x, ps_trained, st_trained) |> first
+        model, ps_trained = p
+        dx .= model(x, ps_trained)
     end
 
 
     # Wrapper for ODE solver
     function rollout(
-            tstate::Training.TrainState, 
+            trained,
+            model,
             x0;
             tspan, 
             solver,
@@ -167,10 +135,9 @@ module HNN
         )
 
         # ODE input, extract trained model parameters
-        model = tstate.model
-        ps = tstate.parameters
-        st = Lux.testmode(tstate.states)
-        p = (model, ps, st)
+        # trained.u = ps (neural parameters) 
+        ps_trained = trained.u
+        p = (model, ps_trained)
 
         prob = ODEProblem(hnn_rhs!, x0, tspan, p)
 
