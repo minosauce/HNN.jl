@@ -46,7 +46,7 @@ $$
 The neural network learns an approximation of the Hamiltonian:
 
 $$
-f_\theta(x) \approx H(x)
+H(x)  \approx f_\theta(x)
 $$
 
 ---
