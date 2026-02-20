@@ -107,7 +107,7 @@ module HNN
                 (iter == 1 || iter % interval == 0)
                 println(
                     "[iter: $(iter)]\t" *
-                    "Loss: $(loss)\t" *
+                    "Loss: $(round(loss, digits=8))\t" *
                     "Training time: $(round(etime, digits=4)) sec"
                 )
             end

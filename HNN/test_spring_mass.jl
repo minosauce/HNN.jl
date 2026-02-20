@@ -99,7 +99,8 @@ display(p1)
 ##
 # 3. Hamiltonian Neural Network by DiffEqFlux.jl
 #
-hnn = Layers.HamiltonianNN{true}(Layers.MLP(2, (32, 32, 1), gelu); autodiff = ad_forward)
+hnn = Layers.HamiltonianNN{true}(
+    Layers.MLP(2, (32, 32, 1), gelu); autodiff = ad_forward)
 ps, st = Lux.setup(Xoshiro(0), hnn)
 model = StatefulLuxLayer(hnn, ps, st)
 ps_c = ps |> ComponentArray
