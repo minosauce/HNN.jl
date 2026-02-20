@@ -88,20 +88,22 @@ $$
 ```text
 training started...
 
-[iter: 1]       Loss: 20.795025         Training time: 12.57 sec
-[iter: 50]      Loss: 2.8498154         Training time: 12.8454 sec
-[iter: 100]     Loss: 0.079303175       Training time: 12.8944 sec
-[iter: 150]     Loss: 0.010104474       Training time: 12.9468 sec
-[iter: 200]     Loss: 0.008350119       Training time: 12.9982 sec
-[iter: 250]     Loss: 0.0072129625      Training time: 13.0468 sec
-[iter: 300]     Loss: 0.0055911485      Training time: 13.0994 sec
-[iter: 350]     Loss: 0.0059271716      Training time: 13.1518 sec
-[iter: 400]     Loss: 0.0048886715      Training time: 13.2019 sec
-[iter: 450]     Loss: 0.0056649945      Training time: 13.2546 sec
-[iter: 500]     Loss: 0.004729797       Training time: 13.3069 sec
-[iter: 500]     Loss: 0.004729797       Training time: 13.3179 sec
+[iter: 1]       Loss: 20.79292          Training time: 0.4714 sec
+[iter: 50]      Loss: 2.8525753         Training time: 0.5266 sec
+[iter: 100]     Loss: 0.08090146        Training time: 0.5761 sec
+[iter: 150]     Loss: 0.01038435        Training time: 0.6252 sec
+[iter: 200]     Loss: 0.00826358        Training time: 0.6739 sec
+[iter: 250]     Loss: 0.00735587        Training time: 0.7244 sec
+[iter: 300]     Loss: 0.00543709        Training time: 0.7746 sec
+[iter: 350]     Loss: 0.00601879        Training time: 0.8237 sec
+[iter: 400]     Loss: 0.00472129        Training time: 0.874 sec
+[iter: 450]     Loss: 0.00574292        Training time: 0.923 sec
+[iter: 500]     Loss: 0.00456861        Training time: 0.9943 sec
+[iter: 500]     Loss: 0.00393435        Training time: 0.9996 sec
 
 training completed.
+
+hamiltonian: 1.8333362
 ```
 
 
