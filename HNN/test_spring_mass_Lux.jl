@@ -1,4 +1,4 @@
-include("LuxHNN.jl")
+include("./src/LuxHNN.jl")
 
 using Lux, MLUtils, ComponentArrays, Random, 
 Optimisers, Plots, OrdinaryDiffEq, Statistics,
@@ -34,7 +34,7 @@ data_noise = (vcat(q_t, p_t) + noise)
 target = vcat(dqdt, dpdt)
 batchsize = 256
 epochs = 125 
-log_itv = 20
+log_iv = 20
 
 # for clean test
 # dataloader = DataLoader((data, target); batchsize = batchsize)
@@ -53,7 +53,7 @@ H_net = Chain(
     Dense(32, 1)
 )
 
-J = LuxHNN.canonical_symplectic(1) 
+J = LuxHNN.symplectic_matrix(1) 
 
 # Hamiltonian Neural Network model
 model = LuxHNN.HamiltonianNN(H_net, J, ad_forward)
@@ -67,7 +67,7 @@ println("training started...\n")
 tstate = LuxHNN.train!(tstate, 
                     dataloader, 
                     epochs = epochs, 
-                    log_interval = log_itv,
+                    log_interval = log_iv,
                     ad = ad_forward)
 
 println("\ntraining completed.")
@@ -106,7 +106,11 @@ function loss_function(ps, databatch)
 end
 
 function callback(state, loss)
-    println("[Hamiltonian NN] Loss: ", loss)
+    iter = state.iter
+    if !(log_iv==0) && 
+        (iter == 1 || iter % log_iv == 0)
+        println("[iter: $iter] Loss: ", loss)
+    end
     return false
 end
 

@@ -1,4 +1,4 @@
-include("HNN.jl")
+include("./src/HNN.jl")
 
 using Lux, MLUtils, ComponentArrays, Random, 
 Optimisers, Plots, OrdinaryDiffEq, Statistics,
@@ -8,7 +8,6 @@ import ADTypes
 
 const ad_forward = ADTypes.AutoForwardDiff()
 const ad_zygote = ADTypes.AutoZygote()
-const ad_reverse = ADTypes.AutoReverseDiff()
 
 ##
 # 1. Data generation: 1D Spring mass system
@@ -52,12 +51,10 @@ H_net = Chain(
     Dense(32, 1)
 )
 
-J = HNN.canonical_symplectic(1) 
-
-# Hamiltonian Neural Network model, # ad_zygote, ad_forward, ad_reverse
-hnn = HNN.HamiltonianNN(H_net, J, ad_forward)
+# Hamiltonian Neural Network model, # ad_zygote, ad_forward
+hnn = HNN.HamiltonianNN(H_net, ad_forward)
 ps, st = Lux.setup(Xoshiro(0), hnn) 
-model = StatefulLuxLayer(hnn, ps, st)
+model = StatefulLuxLayer(hnn, nothing, st)
 ps_c = ps |> ComponentArray
 
 function loss_fn(ps, databatch)
@@ -68,15 +65,20 @@ end
 
 println("\ntraining started...\n")
 opt = OptimizationOptimisers.Adam(0.003f0)
-opt_func = OptimizationFunction(loss_fn, ad_forward)
+opt_func = OptimizationFunction(loss_fn, ad_zygote)
 opt_prob = OptimizationProblem(opt_func, ps_c, dataloader)
 
 cb = HNN.callback_wrapper(log_iv)
 trained = Optimization.solve(opt_prob, opt; callback = cb, epochs = epochs)
+ps_trained = trained.u
 println("\ntraining completed.\n")
 
+hamiltonian = HNN.hamiltonian(hnn, data[:, 1], ps_trained, st)
+println("hamiltonian: $hamiltonian\n")
+
 # Prediction
-pred = HNN.rollout(trained, model, data[:, 1], tspan=(0.0f0, 1.0f0), solver=Tsit5(), saveat=t)
+node = HNN.NeuralODEProblem(model, ps_trained, tspan=(0.0f0, 1.0f0))
+pred = HNN.rollout(node, data[:, 1], solver=Tsit5(), saveat=t)
 
 # plotting
 p1 = plot(data[1, :], data[2, :]; lw = 4, label = "Ground Truth")
@@ -110,7 +112,11 @@ function loss_function(ps, databatch)
 end
 
 function callback(state, loss)
-    println("[Hamiltonian NN] Loss: ", loss)
+    iter = state.iter
+    if !(log_iv==0) && 
+        (iter == 1 || iter % log_iv == 0)
+        println("[iter: $iter] Loss: ", loss)
+    end
     return false
 end
 
