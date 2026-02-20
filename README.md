@@ -88,14 +88,18 @@ $$
 ```text
 training started...
 
-(epoch : 1 / 125)       Training time: 2.6261 [sec]     Loss: 42.271034
-(epoch : 20 / 125)      Training time: 21.4847 [sec]    Loss: 0.3660409
-(epoch : 40 / 125)      Training time: 41.6146 [sec]    Loss: 0.024153993
-(epoch : 60 / 125)      Training time: 61.5919 [sec]    Loss: 0.015001616
-(epoch : 80 / 125)      Training time: 81.5532 [sec]    Loss: 0.011885091
-(epoch : 100 / 125)     Training time: 101.5177 [sec]   Loss: 0.010895904
-(epoch : 120 / 125)     Training time: 121.5637 [sec]   Loss: 0.010584581
-(epoch : 125 / 125)     Training time: 126.5841 [sec]   Loss: 0.010543893
+[iter: 1]       Loss: 20.795025         Training time: 12.57 sec
+[iter: 50]      Loss: 2.8498154         Training time: 12.8454 sec
+[iter: 100]     Loss: 0.079303175       Training time: 12.8944 sec
+[iter: 150]     Loss: 0.010104474       Training time: 12.9468 sec
+[iter: 200]     Loss: 0.008350119       Training time: 12.9982 sec
+[iter: 250]     Loss: 0.0072129625      Training time: 13.0468 sec
+[iter: 300]     Loss: 0.0055911485      Training time: 13.0994 sec
+[iter: 350]     Loss: 0.0059271716      Training time: 13.1518 sec
+[iter: 400]     Loss: 0.0048886715      Training time: 13.2019 sec
+[iter: 450]     Loss: 0.0056649945      Training time: 13.2546 sec
+[iter: 500]     Loss: 0.004729797       Training time: 13.3069 sec
+[iter: 500]     Loss: 0.004729797       Training time: 13.3179 sec
 
 training completed.
 ```
